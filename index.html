@@ -12,19 +12,24 @@
             min-height: 100vh;
             margin: 0;
             background-color: #f0f0f0; /* Warna latar belakang */
-            font-family: monospace; /* Font yang cocok untuk efek ketikan */
+            font-family: 'Courier New', monospace; /* Font yang cocok untuk efek ketikan */
+            color: #333;
         }
         #typing-text {
             font-size: 3em;
-            color: #333;
-            /* Garis vertikal berkedip (cursor) */
-            border-right: .15em solid orange; 
-            /* Sembunyikan overflow secara default */
-            white-space: nowrap; 
-            overflow: hidden; 
+            /* Styling untuk efek kursor */
+            border-right: .15em solid orange; /* Kursor default */
+            white-space: nowrap; /* Pastikan teks tetap satu baris */
+            overflow: hidden; /* Sembunyikan teks yang belum diketik */
             margin: 0 auto;
-            letter-spacing: .15em; 
+            letter-spacing: .15em; /* Jarak antar karakter */
             padding-right: 5px; /* Sedikit ruang untuk kursor */
+        }
+
+        /* Animasi Kursor Berkedip */
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: orange; } /* Warna kursor saat terlihat */
         }
     </style>
 </head>
@@ -33,32 +38,24 @@
     <h1 id="typing-text"></h1>
 
     <script>
-        // Teks yang akan ditampilkan
-        const textToType = "Hello World"; 
-        // Elemen HTML tempat teks akan ditampilkan
+        const textToType = "Hello World";
         const typingElement = document.getElementById('typing-text');
-        // Kecepatan ketikan dalam milidetik per karakter
-        const typingSpeed = 150; 
-        // Indeks karakter saat ini
-        let i = 0; 
+        const typingSpeed = 150;
+        let i = 0;
 
         function typeWriter() {
-            // Cek apakah masih ada karakter yang harus ditampilkan
             if (i < textToType.length) {
-                // Tambahkan karakter berikutnya ke elemen
-                typingElement.innerHTML += textToType.charAt(i); 
-                // Pindah ke karakter berikutnya
-                i++; 
-                // Panggil fungsi ini lagi setelah waktu tertentu
-                setTimeout(typeWriter, typingSpeed); 
+                typingElement.innerHTML += textToType.charAt(i);
+                i++;
+                setTimeout(typeWriter, typingSpeed);
             } else {
-                // Opsional: Hentikan animasi kursor setelah selesai mengetik (gunakan CSS @keyframes jika ingin kursor tetap berkedip)
-                 typingElement.style.borderRight = "none";
+                // Setelah selesai mengetik, terapkan animasi berkedip ke kursor
+                typingElement.style.animation = 'blink-caret .75s step-end infinite';
             }
         }
 
         // Mulai fungsi ketikan
-        typeWriter(); 
+        typeWriter();
     </script>
 
 </body>
