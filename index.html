@@ -1,1 +1,65 @@
-hello world
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Profile Sederhana</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0; /* Warna latar belakang */
+            font-family: monospace; /* Font yang cocok untuk efek ketikan */
+        }
+        #typing-text {
+            font-size: 3em;
+            color: #333;
+            /* Garis vertikal berkedip (cursor) */
+            border-right: .15em solid orange; 
+            /* Sembunyikan overflow secara default */
+            white-space: nowrap; 
+            overflow: hidden; 
+            margin: 0 auto;
+            letter-spacing: .15em; 
+            padding-right: 5px; /* Sedikit ruang untuk kursor */
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="typing-text"></h1>
+
+    <script>
+        // Teks yang akan ditampilkan
+        const textToType = "Hello World"; 
+        // Elemen HTML tempat teks akan ditampilkan
+        const typingElement = document.getElementById('typing-text');
+        // Kecepatan ketikan dalam milidetik per karakter
+        const typingSpeed = 150; 
+        // Indeks karakter saat ini
+        let i = 0; 
+
+        function typeWriter() {
+            // Cek apakah masih ada karakter yang harus ditampilkan
+            if (i < textToType.length) {
+                // Tambahkan karakter berikutnya ke elemen
+                typingElement.innerHTML += textToType.charAt(i); 
+                // Pindah ke karakter berikutnya
+                i++; 
+                // Panggil fungsi ini lagi setelah waktu tertentu
+                setTimeout(typeWriter, typingSpeed); 
+            } else {
+                // Opsional: Hentikan animasi kursor setelah selesai mengetik (gunakan CSS @keyframes jika ingin kursor tetap berkedip)
+                 typingElement.style.borderRight = "none";
+            }
+        }
+
+        // Mulai fungsi ketikan
+        typeWriter(); 
+    </script>
+
+</body>
+</html>
