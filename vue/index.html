@@ -3,371 +3,2043 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Praktikum Vue.js Interaktif</title>
-
-https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css
-
+<title>Praktikum Vue.js — Dasar-Dasar Vue | MSIM4401</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-body{
-    background:#f5f7fb;
-}
-.section{
-    background:white;
-    padding:25px;
-    border-radius:12px;
-    margin-bottom:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-.code{
-    background:#1e1e1e;
-    color:#d4d4d4;
-    padding:15px;
-    border-radius:8px;
-    overflow:auto;
-}
-.success{
-    color:green;
-    font-weight:bold;
-}
-.fail{
-    color:red;
-    font-weight:bold;
-}
+  :root {
+    --bg: #0a0e17;
+    --bg-2: #0f1623;
+    --surface: #161d2c;
+    --surface-2: #1e2738;
+    --border: #2a3548;
+    --border-light: #3a4555;
+    --fg: #f1f5f9;
+    --muted: #94a3b8;
+    --muted-2: #64748b;
+    --vue-green: #42b883;
+    --vue-green-light: #5cd6a4;
+    --vue-dark: #35495e;
+    --amber: #fb923c;
+    --coral: #f87171;
+    --mint: #10b981;
+    --yellow: #fbbf24;
+  }
+  
+  * { box-sizing: border-box; }
+  
+  html { scroll-behavior: smooth; }
+  
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    margin: 0;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+  
+  .font-display { font-family: 'Sora', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  
+  /* === HERO BACKGROUND === */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+  
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.5;
+    animation: float 18s ease-in-out infinite;
+  }
+  
+  .blob-1 { width: 520px; height: 520px; background: var(--vue-green); top: -180px; left: -100px; }
+  .blob-2 { width: 420px; height: 420px; background: var(--amber); bottom: -150px; right: -80px; animation-delay: -9s; opacity: 0.35; }
+  .blob-3 { width: 300px; height: 300px; background: var(--mint); top: 40%; left: 55%; animation-delay: -5s; opacity: 0.3; }
+  
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, 60px) scale(1.1); }
+    66% { transform: translate(-30px, 30px) scale(0.95); }
+  }
+  
+  .grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(66, 184, 131, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(66, 184, 131, 0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at center, black 30%, transparent 75%);
+  }
+  
+  /* Floating particles */
+  .particle {
+    position: absolute;
+    background: var(--vue-green);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particle-rise linear infinite;
+  }
+  
+  @keyframes particle-rise {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-10vh) translateX(80px); opacity: 0; }
+  }
+  
+  /* Vue logo */
+  .vue-logo-svg {
+    filter: drop-shadow(0 0 30px rgba(66, 184, 131, 0.6));
+    animation: logo-pulse 4s ease-in-out infinite;
+  }
+  
+  @keyframes logo-pulse {
+    0%, 100% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 30px rgba(66, 184, 131, 0.5)); }
+    50% { transform: rotate(8deg) scale(1.05); filter: drop-shadow(0 0 50px rgba(66, 184, 131, 0.8)); }
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, var(--vue-green) 0%, var(--vue-green-light) 50%, var(--mint) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  /* Topbar */
+  .topbar {
+    backdrop-filter: blur(20px);
+    background: rgba(10, 14, 23, 0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  /* Cards */
+  .card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--vue-green), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .card:hover::before { opacity: 1; }
+  
+  .card:hover {
+    border-color: rgba(66, 184, 131, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -15px rgba(66, 184, 131, 0.2);
+  }
+  
+  /* Code editor */
+  .code-editor {
+    background: #0d1320;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #e2e8f0;
+    padding: 18px;
+    width: 100%;
+    min-height: 280px;
+    resize: vertical;
+    outline: none;
+    tab-size: 2;
+    white-space: pre;
+    overflow: auto;
+  }
+  
+  .code-editor:focus {
+    border-color: var(--vue-green);
+    box-shadow: 0 0 0 3px rgba(66, 184, 131, 0.15);
+  }
+  
+  /* Preview iframe */
+  .preview-frame {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    min-height: 280px;
+    height: 100%;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--vue-green) 0%, var(--mint) 100%);
+    color: #051410;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -8px rgba(66, 184, 131, 0.6);
+  }
+  
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .btn-secondary:hover {
+    border-color: var(--vue-green);
+    color: var(--vue-green-light);
+  }
+  
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .btn-ghost:hover {
+    color: var(--fg);
+    border-color: var(--border-light);
+  }
+  
+  /* Sidebar nav */
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    color: var(--muted);
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+  }
+  
+  .nav-item:hover {
+    background: var(--surface);
+    color: var(--fg);
+  }
+  
+  .nav-item.active {
+    background: linear-gradient(135deg, rgba(66, 184, 131, 0.15), rgba(16, 185, 129, 0.05));
+    color: var(--vue-green-light);
+  }
+  
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 3px;
+    background: var(--vue-green);
+    border-radius: 3px;
+  }
+  
+  .nav-item.completed .nav-check {
+    color: var(--mint);
+    opacity: 1;
+  }
+  
+  .nav-check {
+    margin-left: auto;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+    font-size: 12px;
+  }
+  
+  /* Code block (display) */
+  .code-block {
+    background: #0d1320;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    overflow-x: auto;
+    position: relative;
+    color: #e2e8f0;
+  }
+  
+  .code-block .kw { color: #c084fc; }
+  .code-block .str { color: #fcd34d; }
+  .code-block .tag { color: #5cd6a4; }
+  .code-block .attr { color: #fb923c; }
+  .code-block .com { color: #64748b; font-style: italic; }
+  .code-block .num { color: #f87171; }
+  .code-block .fn { color: #60a5fa; }
+  
+  .code-block .line-numbers {
+    user-select: none;
+    color: #475569;
+    margin-right: 16px;
+    display: inline-block;
+    text-align: right;
+    width: 24px;
+  }
+  
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  
+  .badge-green {
+    background: rgba(66, 184, 131, 0.15);
+    color: var(--vue-green-light);
+    border: 1px solid rgba(66, 184, 131, 0.3);
+  }
+  
+  .badge-amber {
+    background: rgba(251, 146, 60, 0.15);
+    color: var(--amber);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+  }
+  
+  .badge-coral {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--coral);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+  }
+  
+  .badge-mint {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--mint);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  
+  /* Progress ring */
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.5s ease;
+    stroke-linecap: round;
+  }
+  
+  /* Quiz */
+  .quiz-option {
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  
+  .quiz-option:hover:not(.answered) {
+    border-color: var(--vue-green);
+    background: var(--surface-2);
+    transform: translateX(4px);
+  }
+  
+  .quiz-option.correct {
+    border-color: var(--mint);
+    background: rgba(16, 185, 129, 0.1);
+  }
+  
+  .quiz-option.wrong {
+    border-color: var(--coral);
+    background: rgba(248, 113, 113, 0.08);
+  }
+  
+  .quiz-option .opt-letter {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  
+  .quiz-option.correct .opt-letter { background: var(--mint); color: #051410; }
+  .quiz-option.wrong .opt-letter { background: var(--coral); color: white; }
+  
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border: 1px solid var(--vue-green);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+    transform: translateX(150%);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 360px;
+  }
+  
+  .toast.show { transform: translateX(0); }
+  
+  /* Tabs */
+  .tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    font-weight: 500;
+  }
+  
+  .tab.active {
+    background: var(--surface-2);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  
+  /* Editor chrome */
+  .editor-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom: 0;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .editor-body {
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+  }
+  
+  .editor-body .code-editor {
+    border-radius: 0;
+    border: 1px solid var(--border);
+    border-top: 0;
+  }
+  
+  .preview-wrap {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+  }
+  
+  .preview-header {
+    background: var(--surface);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--mint);
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+    50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--vue-green); }
+  
+  /* Section heading */
+  .section-heading {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  
+  /* Terminal */
+  .terminal {
+    background: #0d1320;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .terminal-header {
+    background: var(--surface);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .term-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  
+  /* Animated typing */
+  .typing-cursor::after {
+    content: '▊';
+    color: var(--vue-green);
+    animation: blink 1s steps(1) infinite;
+  }
+  
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  
+  /* Confetti */
+  .confetti {
+    position: fixed;
+    width: 10px; height: 10px;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  
+  /* Reveal animation */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Highlight inline code */
+  .inline-code {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    color: var(--vue-green-light);
+  }
+  
+  /* Stat */
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  
+  /* Section anchor offset */
+  section { scroll-margin-top: 90px; }
+  
+  /* Logo color override for Vue logo parts */
+  .vue-logo-green { fill: #42b883; }
+  .vue-logo-dark { fill: #35495e; }
+  
+  /* Bouncy entrance for hero text */
+  .bounce-in {
+    animation: bounceIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  
+  @keyframes bounceIn {
+    0% { opacity: 0; transform: translateY(40px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
 </style>
 </head>
 <body>
 
-<div class="container py-4">
+<!-- ============ TOPBAR ============ -->
+<header class="topbar fixed top-0 inset-x-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <svg width="32" height="28" viewBox="0 0 261.76 226.69" class="vue-logo-svg">
+        <path d="M161.096 0L130.879 52.314 100.662 0H0L130.879 226.69 261.76 0z" class="vue-logo-green"/>
+        <path d="M161.096 0L130.879 52.314 100.662 0H65.439L130.879 113.345 196.318 0z" class="vue-logo-dark"/>
+      </svg>
+      <div>
+        <div class="font-display font-bold text-sm leading-tight">Praktikum Vue.js</div>
+        <div class="text-xs text-slate-500 leading-tight">MSIM4401 · Aktivitas 3</div>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-4">
+      <div class="hidden md:flex items-center gap-2 text-xs text-slate-400">
+        <span>Progres</span>
+        <div class="relative w-10 h-10">
+          <svg class="progress-ring" width="40" height="40" viewBox="0 0 40 40" style="transform: rotate(-90deg);">
+            <circle cx="20" cy="20" r="17" stroke="#2a3548" stroke-width="3" fill="none"/>
+            <circle id="progressCircle" class="progress-ring-circle" cx="20" cy="20" r="17" stroke="#42b883" stroke-width="3" fill="none" stroke-dasharray="106.81" stroke-dashoffset="106.81"/>
+          </svg>
+          <div id="progressText" class="absolute inset-0 flex items-center justify-center text-xs font-bold font-mono">0%</div>
+        </div>
+      </div>
+      <button onclick="resetProgress()" class="btn-ghost" title="Reset progres">
+        <i class="fas fa-rotate-left"></i>
+        <span class="hidden sm:inline">Reset</span>
+      </button>
+    </div>
+  </div>
+</header>
 
-    <div class="text-center mb-4">
-        <h1>Praktikum Dasar-Dasar Vue.js</h1>
-        <p class="lead">
-            Aktivitas 3 - MSIM4401
+<!-- ============ HERO ============ -->
+<section id="hero" class="relative min-h-screen flex items-center pt-20">
+  <div class="hero-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="grid-pattern"></div>
+    <div id="particles"></div>
+  </div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center w-full">
+    <!-- Left: content -->
+    <div class="bounce-in">
+      <div class="badge badge-green mb-6">
+        <i class="fas fa-graduation-cap"></i>
+        Modul Praktikum · Dasar-Dasar Vue
+      </div>
+      
+      <h1 class="font-display font-extrabold text-5xl md:text-6xl lg:text-7xl leading-[0.95] mb-6 tracking-tight">
+        Belajar <span class="gradient-text">Vue.js</span><br>
+        dari Nol sampai<br>
+        <span class="text-slate-400">Komponen.</span>
+      </h1>
+      
+      <p class="text-lg text-slate-400 mb-8 max-w-xl leading-relaxed">
+        Halaman praktikum interaktif berdasarkan <span class="text-slate-200 font-semibold">MSIM4401 Modul 02.3</span>. 
+        Tulis kode Vue di editor, jalankan langsung, dan lihat hasilnya saat itu juga — tanpa perlu instalasi.
+      </p>
+      
+      <div class="flex flex-wrap gap-3 mb-10">
+        <a href="#instalasi" class="btn-primary">
+          <i class="fas fa-play"></i>
+          Mulai Praktikum
+        </a>
+        <a href="#rendering" class="btn-secondary">
+          <i class="fas fa-code"></i>
+          Lihat Kode Contoh
+        </a>
+      </div>
+      
+      <div class="grid grid-cols-3 gap-3 max-w-md">
+        <div class="stat-box">
+          <div class="font-display font-bold text-2xl text-emerald-400">6</div>
+          <div class="text-xs text-slate-500 mt-1">Topik</div>
+        </div>
+        <div class="stat-box">
+          <div class="font-display font-bold text-2xl text-orange-400">5</div>
+          <div class="text-xs text-slate-500 mt-1">Live Demo</div>
+        </div>
+        <div class="stat-box">
+          <div class="font-display font-bold text-2xl text-mint-400" style="color:#10b981">5</div>
+          <div class="text-xs text-slate-500 mt-1">Quiz</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right: animated code window -->
+    <div class="bounce-in" style="animation-delay: 0.2s">
+      <div class="terminal shadow-2xl">
+        <div class="terminal-header">
+          <div class="term-dot" style="background:#f87171"></div>
+          <div class="term-dot" style="background:#fbbf24"></div>
+          <div class="term-dot" style="background:#42b883"></div>
+          <div class="ml-2 text-xs text-slate-500 font-mono">App.vue</div>
+          <div class="ml-auto text-xs text-slate-600">live</div>
+        </div>
+        <div class="p-5 font-mono text-sm leading-relaxed">
+          <div><span class="text-purple-400">const</span> <span class="text-blue-400">{ createApp }</span> = <span class="text-orange-400">Vue</span>;</div>
+          <div class="mt-2"><span class="text-purple-400">const</span> <span class="text-blue-400">App</span> = {</div>
+          <div class="ml-4"><span class="text-emerald-400">data</span>() {</div>
+          <div class="ml-8"><span class="text-purple-400">return</span> {</div>
+          <div class="ml-12"><span class="text-blue-400">name</span>: <span class="text-amber-300">"Vue"</span>,</div>
+          <div class="ml-12"><span class="text-blue-400">counter</span>: <span class="text-red-400">0</span></div>
+          <div class="ml-8">};</div>
+          <div class="ml-4">},</div>
+          <div class="ml-4"><span class="text-emerald-400">mounted</span>() {</div>
+          <div class="ml-8"><span class="text-blue-400">setInterval</span>(() => {</div>
+          <div class="ml-12"><span class="text-purple-400">this</span>.counter++</div>
+          <div class="ml-8">}, <span class="text-red-400">1000</span>)</div>
+          <div class="ml-4">}</div>
+          <div>};</div>
+          <div class="mt-2">createApp(App).mount(<span class="text-amber-300">"#app"</span>);</div>
+          <div class="mt-3 text-slate-500">// hasil:</div>
+          <div class="text-emerald-300 typing-cursor" id="typingOutput">Halo Vue, detik berjalan: <span id="liveCounter">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-500 text-xs flex flex-col items-center gap-1">
+    <span>Scroll untuk mulai</span>
+    <i class="fas fa-chevron-down animate-bounce"></i>
+  </div>
+</section>
+
+<!-- ============ MAIN LAYOUT ============ -->
+<div class="max-w-7xl mx-auto px-6 py-16">
+  <div class="grid grid-cols-12 gap-8">
+    
+    <!-- SIDEBAR -->
+    <aside class="col-span-12 lg:col-span-3">
+      <div class="sticky top-24">
+        <div class="card p-5">
+          <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-3">Daftar Isi</div>
+          <nav class="flex flex-col gap-1">
+            <a href="#instalasi" class="nav-item" data-section="instalasi">
+              <i class="fas fa-download w-5 text-center"></i>
+              <span>Instalasi & Konfigurasi</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+            <a href="#struktur" class="nav-item" data-section="struktur">
+              <i class="fas fa-folder-tree w-5 text-center"></i>
+              <span>Struktur Proyek</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+            <a href="#rendering" class="nav-item" data-section="rendering">
+              <i class="fas fa-eye w-5 text-center"></i>
+              <span>Rendering Deklaratif</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+            <a href="#interaksi" class="nav-item" data-section="interaksi">
+              <i class="fas fa-hand-pointer w-5 text-center"></i>
+              <span>Interaksi (v-on)</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+            <a href="#vif" class="nav-item" data-section="vif">
+              <i class="fas fa-code-branch w-5 text-center"></i>
+              <span>Kondisional (v-if)</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+            <a href="#vfor" class="nav-item" data-section="vfor">
+              <i class="fas fa-list-ol w-5 text-center"></i>
+              <span>Perulangan (v-for)</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+            <a href="#komponen" class="nav-item" data-section="komponen">
+              <i class="fas fa-cubes w-5 text-center"></i>
+              <span>Komponen Dasar</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+            <a href="#quiz" class="nav-item" data-section="quiz">
+              <i class="fas fa-trophy w-5 text-center"></i>
+              <span>Tantangan</span>
+              <i class="fas fa-check nav-check"></i>
+            </a>
+          </nav>
+          
+          <div class="mt-5 pt-5 border-t border-slate-700/50">
+            <div class="text-xs text-slate-500 mb-2">Status Praktikum</div>
+            <div class="flex items-center gap-2 text-sm">
+              <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+              <span class="text-slate-300">Vue 3 siap digunakan</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- CONTENT -->
+    <main class="col-span-12 lg:col-span-9 space-y-20">
+      
+      <!-- ===== SECTION: INSTALASI ===== -->
+      <section id="instalasi" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-green">Bagian A</span>
+          <span class="text-xs text-slate-500 font-mono">01 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Instalasi, Konfigurasi & Memulai Vue</h2>
+        <p class="text-slate-400 mb-8 max-w-3xl">
+          Ada tiga cara untuk memulai proyek Vue: menggunakan <span class="inline-code">CLI</span>, 
+          <span class="inline-code">CDN</span>, atau <span class="inline-code">NPM</span>. 
+          Pilih cara yang paling sesuai dengan kebutuhan Anda.
         </p>
-    </div>
-
-    <!-- INTRO -->
-    <div class="section">
-        <h2>🎯 Tujuan Praktikum</h2>
-        <ul>
-            <li>Memahami instalasi Vue CLI.</li>
-            <li>Memahami penggunaan Vue melalui CDN.</li>
-            <li>Memahami rendering deklaratif.</li>
-            <li>Memahami event handling.</li>
-            <li>Memahami v-if dan v-for.</li>
-            <li>Memahami komponen dasar Vue.</li>
-        </ul>
-    </div>
-
-    <!-- INSTALASI -->
-    <div class="section">
-        <h2>1. Instalasi Vue CLI</h2>
-
-        <p>Jalankan perintah berikut pada terminal:</p>
-
-<div class="code">
-npm install -g @vue/cli
-
-vue create first-vue
-
-cd first-vue
-
-npm run serve
-</div>
-
-        <h5 class="mt-3">Checklist Praktikum</h5>
-
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox">
-            <label class="form-check-label">
-                Node.js sudah terinstal
-            </label>
-        </div>
-
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox">
-            <label class="form-check-label">
-                Vue CLI berhasil diinstal
-            </label>
-        </div>
-
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox">
-            <label class="form-check-label">
-                Proyek Vue berhasil dijalankan
-            </label>
-        </div>
-    </div>
-
-    <!-- CDN -->
-    <div class="section">
-        <h2>2. Vue Menggunakan CDN</h2>
-
-<div class="code">
-&lt;div id="app"&gt;&lt;/div&gt;
-
-&lt;script src="https://unpkg.com/vue@next"&gt;&lt;/script&gt;
-</div>
-
-        <div class="alert alert-info mt-3">
-            CDN memungkinkan Vue digunakan tanpa proses instalasi proyek.
-        </div>
-    </div>
-
-    <!-- QUIZ 1 -->
-    <div class="section">
-        <h2>📝 Kuis 1</h2>
-
-        <p>Apa fungsi perintah berikut?</p>
-
-<div class="code">
-npm run serve
-</div>
-
-        <select class="form-select" id="quiz1">
-            <option value="">Pilih Jawaban</option>
-            <option value="A">Menghapus proyek</option>
-            <option value="B">Menjalankan aplikasi Vue dalam mode development</option>
-            <option value="C">Menginstal Node.js</option>
-        </select>
-
-        <button class="btn btn-primary mt-3" onclick="cekQuiz1()">
-            Periksa
-        </button>
-
-        <p id="hasilQuiz1" class="mt-3"></p>
-    </div>
-
-    <!-- VUE DEMO -->
-    <div class="section">
-        <h2>3. Demo Rendering Deklaratif</h2>
-
-        <div id="renderApp">
-            <h4>Halo {{ nama }}</h4>
-            <p>Counter: {{ counter }}</p>
-        </div>
-    </div>
-
-    <!-- EVENT -->
-    <div class="section">
-        <h2>4. Demo Event Handling</h2>
-
-        <div id="reverseApp">
-
-            <p>{{ pesan }}</p>
-
-            <button class="btn btn-success"
-                @click="balikPesan">
-                Balik String
-            </button>
-
-        </div>
-    </div>
-
-    <!-- VIF -->
-    <div class="section">
-        <h2>5. Demo v-if</h2>
-
-        <div id="ifApp">
-
-            <p v-if="terlihat">
-                Universitas Terbuka
+        
+        <div class="grid md:grid-cols-3 gap-5">
+          <!-- CLI -->
+          <div class="card p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                <i class="fas fa-terminal text-emerald-400"></i>
+              </div>
+              <h3 class="font-display font-bold text-lg">Vue CLI</h3>
+            </div>
+            <p class="text-sm text-slate-400 mb-4">
+              Cara paling lengkap untuk membangun proyek Vue. Membutuhkan Node.js terpasang.
             </p>
-
-            <button
-                class="btn btn-warning"
-                @click="toggle">
-                {{ tombol }}
+            <div class="code-block text-xs">
+              <div><span class="com"># instalasi CLI</span></div>
+              <div><span class="kw">npm</span> install -g <span class="str">@vue/cli</span></div>
+              <div class="mt-2"><span class="com"># buat proyek</span></div>
+              <div><span class="kw">vue</span> create first-vue</div>
+              <div class="mt-2"><span class="com"># pilih Vue 3</span></div>
+              <div><span class="kw">cd</span> first-vue</div>
+              <div><span class="kw">npm</span> run serve</div>
+            </div>
+            <div class="mt-3 text-xs text-amber-400 flex items-start gap-2">
+              <i class="fas fa-triangle-exclamation mt-0.5"></i>
+              <span>Butuh koneksi internet & Node.js. Jalankan sebagai Administrator bila ada kendala sekuriti.</span>
+            </div>
+          </div>
+          
+          <!-- CDN -->
+          <div class="card p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-orange-500/15 flex items-center justify-center">
+                <i class="fas fa-cloud text-orange-400"></i>
+              </div>
+              <h3 class="font-display font-bold text-lg">CDN</h3>
+            </div>
+            <p class="text-sm text-slate-400 mb-4">
+              Cara paling cepat untuk mencoba Vue. Cukup sertakan tag script di HTML.
+            </p>
+            <div class="code-block text-xs">
+              <div><span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="str">"app"</span><span class="tag">&gt;&lt;/div&gt;</span></div>
+              <div class="mt-1"><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="str">"https://unpkg.com/vue@next"</span><span class="tag">&gt;&lt;/script&gt;</span></div>
+              <div class="mt-1"><span class="tag">&lt;script&gt;</span></div>
+              <div><span class="kw">const</span> { createApp } = <span class="fn">Vue</span>;</div>
+              <div><span class="kw">const</span> App = {</div>
+              <div class="ml-3"><span class="fn">data</span>() { <span class="kw">return</span> { <span class="attr">name</span>: <span class="str">"Vue CDN"</span> }; },</div>
+              <div class="ml-3">template: <span class="str">`&lt;h1&gt;Halo {{ name }}!&lt;/h1&gt;`</span></div>
+              <div>};</div>
+              <div><span class="fn">createApp</span>(App).<span class="fn">mount</span>(<span class="str">"#app"</span>);</div>
+              <div><span class="tag">&lt;/script&gt;</span></div>
+            </div>
+          </div>
+          
+          <!-- NPM -->
+          <div class="card p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                <i class="fab fa-npm text-emerald-400 text-2xl"></i>
+              </div>
+              <h3 class="font-display font-bold text-lg">NPM</h3>
+            </div>
+            <p class="text-sm text-slate-400 mb-4">
+              Untuk proyek yang lebih terstruktur, gunakan NPM dan referensikan file lokal.
+            </p>
+            <div class="code-block text-xs">
+              <div><span class="kw">npm</span> init -y</div>
+              <div><span class="kw">npm</span> install vue@next --save-dev</div>
+              <div class="mt-2"><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="str">"node_modules/vue/dist/vue.global.js"</span><span class="tag">&gt;&lt;/script&gt;</span></div>
+              <div class="mt-2"><span class="com"># file HTML harus satu rute</span></div>
+              <div><span class="com"># dengan folder node_modules</span></div>
+            </div>
+            <div class="mt-3 text-xs text-slate-500 flex items-start gap-2">
+              <i class="fas fa-info-circle mt-0.5 text-blue-400"></i>
+              <span>Setelah <span class="inline-code">npm run serve</span>, aplikasi bisa diakses di <span class="inline-code">localhost:8080</span></span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6 flex items-center gap-3">
+          <button onclick="markSection('instalasi')" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Tandai Selesai
+          </button>
+          <span class="text-xs text-slate-500">Klik untuk menandai topik ini selesai</span>
+        </div>
+      </section>
+      
+      <!-- ===== SECTION: STRUKTUR ===== -->
+      <section id="struktur" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-amber">Bagian B</span>
+          <span class="text-xs text-slate-500 font-mono">02 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Struktur Proyek Vue</h2>
+        <p class="text-slate-400 mb-8 max-w-3xl">
+          Vue CLI membuat kerangka direktori yang rapi. Pahami setiap bagian agar mudah mengelola kode.
+        </p>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="card p-6">
+            <h3 class="font-display font-bold text-lg mb-4 flex items-center gap-2">
+              <i class="fas fa-file text-orange-400"></i>
+              File di Root
+            </h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex gap-3">
+                <span class="inline-code">babel.config.js</span>
+                <span class="text-slate-400">Konfigurasi Babel — transpiler JavaScript ke versi yang lebih lama untuk kompatibilitas browser.</span>
+              </div>
+              <div class="flex gap-3">
+                <span class="inline-code">package.json</span>
+                <span class="text-slate-400">Konfigurasi proyek JavaScript, daftar dependencies, dan script.</span>
+              </div>
+              <div class="flex gap-3">
+                <span class="inline-code">README.md</span>
+                <span class="text-slate-400">Dokumentasi singkat proyek.</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card p-6">
+            <h3 class="font-display font-bold text-lg mb-4 flex items-center gap-2">
+              <i class="fas fa-folder text-emerald-400"></i>
+              Direktori Penting
+            </h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex gap-3">
+                <span class="inline-code">node_modules/</span>
+                <span class="text-slate-400">Menyimpan paket-paket pustaka yang dipasang via npm.</span>
+              </div>
+              <div class="flex gap-3">
+                <span class="inline-code">public/</span>
+                <span class="text-slate-400">Menyimpan file HTML utama yang akan menjadi tampilan dasar.</span>
+              </div>
+              <div class="flex gap-3">
+                <span class="inline-code">src/</span>
+                <span class="text-slate-400">Menyimpan kode sumber aplikasi Anda.</span>
+              </div>
+              <div class="flex gap-3">
+                <span class="inline-code">src/main.js</span>
+                <span class="text-slate-400">Entry point yang menghubungkan <span class="inline-code">public/index.html</span> dengan komponen utama.</span>
+              </div>
+              <div class="flex gap-3">
+                <span class="inline-code">src/components/</span>
+                <span class="text-slate-400">Tempat menyimpan definisi komponen Vue (.vue).</span>
+              </div>
+              <div class="flex gap-3">
+                <span class="inline-code">src/assets/</span>
+                <span class="text-slate-400">File gambar, multimedia, dan aset lainnya.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6 card p-6 bg-emerald-500/5 border-emerald-500/20">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-lightbulb text-emerald-400"></i>
+            </div>
+            <div>
+              <h4 class="font-display font-bold mb-1">Tip: Vue UI</h4>
+              <p class="text-sm text-slate-400">
+                Anda juga bisa mengelola proyek Vue via GUI berbasis browser. Jalankan perintah <span class="inline-code">vue ui</span> di terminal, 
+                dan Vue akan membuka dashboard proyek di browser. Semua yang bisa dilakukan di shell juga bisa dilakukan di GUI.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button onclick="markSection('struktur')" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Tandai Selesai
+          </button>
+        </div>
+      </section>
+      
+      <!-- ===== SECTION: RENDERING ===== -->
+      <section id="rendering" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-mint">Praktik</span>
+          <span class="text-xs text-slate-500 font-mono">03 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Rendering Deklaratif</h2>
+        <p class="text-slate-400 mb-6 max-w-3xl">
+          Vue memproses keluaran ke DOM secara deklaratif menggunakan template <span class="inline-code">{{ }}</span>. 
+          Coba ubah kode di bawah dan tekan <strong>Jalankan</strong> untuk melihat hasilnya langsung.
+        </p>
+        
+        <div class="grid lg:grid-cols-2 gap-5">
+          <!-- Editor -->
+          <div>
+            <div class="editor-header">
+              <div class="flex gap-1.5">
+                <div class="term-dot" style="background:#f87171"></div>
+                <div class="term-dot" style="background:#fbbf24"></div>
+                <div class="term-dot" style="background:#42b883"></div>
+              </div>
+              <div class="text-xs text-slate-500 font-mono ml-2">rendering-deklaratif.html</div>
+              <div class="ml-auto flex gap-1">
+                <button onclick="resetEditor('rendering')" class="btn-ghost text-xs" title="Reset kode">
+                  <i class="fas fa-rotate-left"></i>
+                </button>
+              </div>
+            </div>
+            <div class="editor-body">
+              <textarea id="code-rendering" class="code-editor" spellcheck="false"></textarea>
+            </div>
+            <div class="mt-3 flex gap-2">
+              <button onclick="runCode('rendering')" class="btn-primary">
+                <i class="fas fa-play"></i>
+                Jalankan
+              </button>
+              <span class="text-xs text-slate-500 self-center">Vue 3 sudah otomatis disertakan</span>
+            </div>
+          </div>
+          
+          <!-- Preview -->
+          <div>
+            <div class="preview-wrap" style="height:100%; min-height:300px;">
+              <div class="preview-header">
+                <div class="flex items-center gap-2">
+                  <span class="live-dot"></span>
+                  <span>Preview Live</span>
+                </div>
+                <span class="font-mono">localhost</span>
+              </div>
+              <iframe id="preview-rendering" class="preview-frame" style="border:0; min-height:280px;"></iframe>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-5 card p-5">
+          <h4 class="font-display font-bold mb-3 flex items-center gap-2">
+            <i class="fas fa-book text-emerald-400"></i>
+            Penjelasan
+          </h4>
+          <ul class="space-y-2 text-sm text-slate-400 list-disc list-inside">
+            <li><span class="inline-code">{{ name }}</span> akan diganti dengan nilai dari <span class="inline-code">name</span> di state <span class="inline-code">data()</span>.</li>
+            <li>Directive <span class="inline-code">mounted()</span> adalah lifecycle hook yang dipanggil setelah komponen dirender ke DOM.</li>
+            <li><span class="inline-code">setInterval</span> menambah nilai counter setiap 1000ms (1 detik). Karena Vue reaktif, DOM otomatis di-update.</li>
+          </ul>
+        </div>
+        
+        <div class="mt-6">
+          <button onclick="markSection('rendering')" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Tandai Selesai
+          </button>
+        </div>
+      </section>
+      
+      <!-- ===== SECTION: INTERAKSI ===== -->
+      <section id="interaksi" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-mint">Praktik</span>
+          <span class="text-xs text-slate-500 font-mono">04 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Interaksi dengan Pemakai</h2>
+        <p class="text-slate-400 mb-6 max-w-3xl">
+          Vue menggunakan directive <span class="inline-code">v-on:&lt;event&gt;</span> untuk menangani event. 
+          Sebagai contoh, <span class="inline-code">v-on:click</span> menangani klik tombol. 
+          Klik tombol di preview untuk membalik string!
+        </p>
+        
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div>
+            <div class="editor-header">
+              <div class="flex gap-1.5">
+                <div class="term-dot" style="background:#f87171"></div>
+                <div class="term-dot" style="background:#fbbf24"></div>
+                <div class="term-dot" style="background:#42b883"></div>
+              </div>
+              <div class="text-xs text-slate-500 font-mono ml-2">interaksi-pemakai.html</div>
+              <button onclick="resetEditor('interaksi')" class="btn-ghost text-xs ml-auto" title="Reset kode">
+                <i class="fas fa-rotate-left"></i>
+              </button>
+            </div>
+            <div class="editor-body">
+              <textarea id="code-interaksi" class="code-editor" spellcheck="false"></textarea>
+            </div>
+            <div class="mt-3">
+              <button onclick="runCode('interaksi')" class="btn-primary">
+                <i class="fas fa-play"></i>
+                Jalankan
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <div class="preview-wrap" style="height:100%; min-height:300px;">
+              <div class="preview-header">
+                <div class="flex items-center gap-2">
+                  <span class="live-dot"></span>
+                  <span>Preview Live</span>
+                </div>
+                <span class="font-mono">localhost</span>
+              </div>
+              <iframe id="preview-interaksi" class="preview-frame" style="border:0; min-height:280px;"></iframe>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-5 card p-5">
+          <h4 class="font-display font-bold mb-3 flex items-center gap-2">
+            <i class="fas fa-book text-emerald-400"></i>
+            Penjelasan
+          </h4>
+          <ul class="space-y-2 text-sm text-slate-400 list-disc list-inside">
+            <li><span class="inline-code">v-on:click="reverseStr"</span> mendaftarkan event listener untuk klik tombol.</li>
+            <li>Saat tombol diklik, fungsi <span class="inline-code">reverseStr</span> di dalam <span class="inline-code">methods</span> dijalankan.</li>
+            <li><span class="inline-code">split('').reverse().join('')</span> memecah string jadi array karakter, membalik urutannya, lalu menggabungkan kembali.</li>
+            <li>Shorthand: <span class="inline-code">@click="reverseStr"</span> sama dengan <span class="inline-code">v-on:click="reverseStr"</span>.</li>
+          </ul>
+        </div>
+        
+        <div class="mt-6">
+          <button onclick="markSection('interaksi')" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Tandai Selesai
+          </button>
+        </div>
+      </section>
+      
+      <!-- ===== SECTION: V-IF ===== -->
+      <section id="vif" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-mint">Praktik</span>
+          <span class="text-xs text-slate-500 font-mono">05 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Struktur Kendali: <span class="gradient-text">v-if</span></h2>
+        <p class="text-slate-400 mb-6 max-w-3xl">
+          Directive <span class="inline-code">v-if</span> digunakan untuk rendering kondisional. 
+          Elemen hanya ditampilkan jika kondisi bernilai <span class="inline-code">true</span>.
+        </p>
+        
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div>
+            <div class="editor-header">
+              <div class="flex gap-1.5">
+                <div class="term-dot" style="background:#f87171"></div>
+                <div class="term-dot" style="background:#fbbf24"></div>
+                <div class="term-dot" style="background:#42b883"></div>
+              </div>
+              <div class="text-xs text-slate-500 font-mono ml-2">v-if.html</div>
+              <button onclick="resetEditor('vif')" class="btn-ghost text-xs ml-auto" title="Reset kode">
+                <i class="fas fa-rotate-left"></i>
+              </button>
+            </div>
+            <div class="editor-body">
+              <textarea id="code-vif" class="code-editor" spellcheck="false"></textarea>
+            </div>
+            <div class="mt-3">
+              <button onclick="runCode('vif')" class="btn-primary">
+                <i class="fas fa-play"></i>
+                Jalankan
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <div class="preview-wrap" style="height:100%; min-height:300px;">
+              <div class="preview-header">
+                <div class="flex items-center gap-2">
+                  <span class="live-dot"></span>
+                  <span>Preview Live</span>
+                </div>
+                <span class="font-mono">localhost</span>
+              </div>
+              <iframe id="preview-vif" class="preview-frame" style="border:0; min-height:280px;"></iframe>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-5 card p-5">
+          <h4 class="font-display font-bold mb-3 flex items-center gap-2">
+            <i class="fas fa-book text-emerald-400"></i>
+            Penjelasan
+          </h4>
+          <ul class="space-y-2 text-sm text-slate-400 list-disc list-inside">
+            <li><span class="inline-code">v-if="terlihat"</span> hanya merender elemen <span class="inline-code">&lt;p&gt;</span> jika <span class="inline-code">terlihat</span> bernilai true.</li>
+            <li>Tombol mengubah state <span class="inline-code">terlihat</span> dan teks <span class="inline-code">aksi</span> secara bersamaan.</li>
+            <li>Perhatikan logika <span class="inline-code">onOff()</span>: bila teks tombol "Sembunyikan", ubah menjadi "Tampilkan" dan sembunyikan paragraf.</li>
+            <li>Vue juga menyediakan <span class="inline-code">v-else</span> dan <span class="inline-code">v-else-if</span> untuk percabangan lebih kompleks.</li>
+          </ul>
+        </div>
+        
+        <div class="mt-6">
+          <button onclick="markSection('vif')" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Tandai Selesai
+          </button>
+        </div>
+      </section>
+      
+      <!-- ===== SECTION: V-FOR ===== -->
+      <section id="vfor" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-mint">Praktik</span>
+          <span class="text-xs text-slate-500 font-mono">06 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Perulangan dengan <span class="gradient-text">v-for</span></h2>
+        <p class="text-slate-400 mb-6 max-w-3xl">
+          Directive <span class="inline-code">v-for</span> digunakan untuk menampilkan daftar item dari array. 
+          Setiap item harus memiliki <span class="inline-code">key</span> unik agar Vue bisa melacak perubahan secara efisien.
+        </p>
+        
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div>
+            <div class="editor-header">
+              <div class="flex gap-1.5">
+                <div class="term-dot" style="background:#f87171"></div>
+                <div class="term-dot" style="background:#fbbf24"></div>
+                <div class="term-dot" style="background:#42b883"></div>
+              </div>
+              <div class="text-xs text-slate-500 font-mono ml-2">v-for.html</div>
+              <button onclick="resetEditor('vfor')" class="btn-ghost text-xs ml-auto" title="Reset kode">
+                <i class="fas fa-rotate-left"></i>
+              </button>
+            </div>
+            <div class="editor-body">
+              <textarea id="code-vfor" class="code-editor" spellcheck="false"></textarea>
+            </div>
+            <div class="mt-3">
+              <button onclick="runCode('vfor')" class="btn-primary">
+                <i class="fas fa-play"></i>
+                Jalankan
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <div class="preview-wrap" style="height:100%; min-height:300px;">
+              <div class="preview-header">
+                <div class="flex items-center gap-2">
+                  <span class="live-dot"></span>
+                  <span>Preview Live</span>
+                </div>
+                <span class="font-mono">localhost</span>
+              </div>
+              <iframe id="preview-vfor" class="preview-frame" style="border:0; min-height:280px;"></iframe>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-5 card p-5">
+          <h4 class="font-display font-bold mb-3 flex items-center gap-2">
+            <i class="fas fa-book text-emerald-400"></i>
+            Penjelasan
+          </h4>
+          <ul class="space-y-2 text-sm text-slate-400 list-disc list-inside">
+            <li><span class="inline-code">v-for="mk in daftarMK"</span> mengiterasi setiap item dalam array <span class="inline-code">daftarMK</span>.</li>
+            <li><span class="inline-code">v-bind:key="mk.text"</span> memberi Vue cara untuk melacak setiap item secara unik. Bisa disingkat <span class="inline-code">:key</span>.</li>
+            <li>Anda juga bisa mendapatkan index: <span class="inline-code">v-for="(mk, index) in daftarMK"</span>.</li>
+            <li>Wajib menggunakan <span class="inline-code">key</span> yang unik untuk performa dan stabilitas rendering.</li>
+          </ul>
+        </div>
+        
+        <div class="mt-6">
+          <button onclick="markSection('vfor')" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Tandai Selesai
+          </button>
+        </div>
+      </section>
+      
+      <!-- ===== SECTION: KOMPONEN ===== -->
+      <section id="komponen" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-mint">Praktik</span>
+          <span class="text-xs text-slate-500 font-mono">07 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Komponen Dasar</h2>
+        <p class="text-slate-400 mb-6 max-w-3xl">
+          Komponen memperluas HTML dengan tag-tag baru yang dapat dipakai ulang. 
+          Kita bisa mendaftarkan komponen dengan <span class="inline-code">app.component()</span> dan menyertakannya di template seperti tag HTML biasa.
+        </p>
+        
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div>
+            <div class="editor-header">
+              <div class="flex gap-1.5">
+                <div class="term-dot" style="background:#f87171"></div>
+                <div class="term-dot" style="background:#fbbf24"></div>
+                <div class="term-dot" style="background:#42b883"></div>
+              </div>
+              <div class="text-xs text-slate-500 font-mono ml-2">komponen-dasar.html</div>
+              <button onclick="resetEditor('komponen')" class="btn-ghost text-xs ml-auto" title="Reset kode">
+                <i class="fas fa-rotate-left"></i>
+              </button>
+            </div>
+            <div class="editor-body">
+              <textarea id="code-komponen" class="code-editor" spellcheck="false"></textarea>
+            </div>
+            <div class="mt-3">
+              <button onclick="runCode('komponen')" class="btn-primary">
+                <i class="fas fa-play"></i>
+                Jalankan
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <div class="preview-wrap" style="height:100%; min-height:300px;">
+              <div class="preview-header">
+                <div class="flex items-center gap-2">
+                  <span class="live-dot"></span>
+                  <span>Preview Live</span>
+                </div>
+                <span class="font-mono">localhost</span>
+              </div>
+              <iframe id="preview-komponen" class="preview-frame" style="border:0; min-height:280px;"></iframe>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-5 card p-5">
+          <h4 class="font-display font-bold mb-3 flex items-center gap-2">
+            <i class="fas fa-book text-emerald-400"></i>
+            Penjelasan
+          </h4>
+          <ul class="space-y-2 text-sm text-slate-400 list-disc list-inside">
+            <li><span class="inline-code">app.component('daftar-mk', {...})</span> mendaftarkan komponen baru dengan tag <span class="inline-code">&lt;daftar-mk&gt;</span>.</li>
+            <li><span class="inline-code">props: ['mk']</span> mendeklarasikan atribut kustom yang bisa diterima komponen dari induknya.</li>
+            <li><span class="inline-code">v-bind:mk="mkDitawarkan"</span> mengirim data ke komponen via props.</li>
+            <li>Template komponen bisa berisi HTML apa pun, termasuk komponen lain (komposisi).</li>
+            <li>Nama komponen dalam HTML harus kebab-case: <span class="inline-code">daftar-mk</span>, bukan <span class="inline-code">daftarMk</span>.</li>
+          </ul>
+        </div>
+        
+        <div class="mt-6">
+          <button onclick="markSection('komponen')" class="btn-primary">
+            <i class="fas fa-check"></i>
+            Tandai Selesai
+          </button>
+        </div>
+      </section>
+      
+      <!-- ===== SECTION: QUIZ ===== -->
+      <section id="quiz" class="reveal">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="badge badge-coral">Evaluasi</span>
+          <span class="text-xs text-slate-500 font-mono">08 / 08</span>
+        </div>
+        <h2 class="section-heading text-3xl md:text-4xl mb-4">Tantangan Akhir</h2>
+        <p class="text-slate-400 mb-8 max-w-3xl">
+          Uji pemahaman Anda dengan 5 pertanyaan berikut. Pilih jawaban yang paling tepat berdasarkan materi praktikum.
+        </p>
+        
+        <div class="card p-6 md:p-8">
+          <div class="flex items-center justify-between mb-6">
+            <div class="text-sm text-slate-400">
+              Skor: <span id="quizScore" class="font-bold text-emerald-400 text-lg">0</span> / 5
+            </div>
+            <div class="text-xs text-slate-500">
+              Pertanyaan <span id="quizCurrent">1</span> dari 5
+            </div>
+          </div>
+          
+          <div id="quizContainer"></div>
+          
+          <div class="mt-6 flex justify-between items-center">
+            <button id="quizPrev" onclick="prevQuestion()" class="btn-secondary" disabled>
+              <i class="fas fa-arrow-left"></i>
+              Sebelumnya
             </button>
-
+            <button id="quizNext" onclick="nextQuestion()" class="btn-primary">
+              Berikutnya
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
         </div>
-    </div>
-
-    <!-- VFOR -->
-    <div class="section">
-        <h2>6. Demo v-for</h2>
-
-        <div id="forApp">
-
-            <ol>
-                <li v-for="mk in matakuliah">
-                    {{ mk }}
-                </li>
-            </ol>
-
+        
+        <div id="quizResult" class="mt-6 card p-8 text-center hidden">
+          <div class="w-20 h-20 mx-auto rounded-full bg-emerald-500/15 flex items-center justify-center mb-4">
+            <i class="fas fa-trophy text-4xl text-emerald-400"></i>
+          </div>
+          <h3 class="font-display font-bold text-2xl mb-2">Selamat!</h3>
+          <p class="text-slate-400 mb-4">Anda menyelesaikan tantangan dengan skor:</p>
+          <div class="font-display font-extrabold text-5xl gradient-text mb-4" id="finalScore">0/5</div>
+          <p class="text-sm text-slate-500 mb-6" id="resultMessage">Lanjutkan praktik dan terus eksplor Vue.js!</p>
+          <button onclick="resetQuiz()" class="btn-secondary">
+            <i class="fas fa-rotate-left"></i>
+            Ulangi Tantangan
+          </button>
         </div>
-    </div>
-
-    <!-- KOMPONEN -->
-    <div class="section">
-        <h2>7. Demo Komponen Vue</h2>
-
-        <div id="componentApp">
-
-            <ol>
-                <daftar-mk
-                    v-for="item in mataKuliah"
-                    :mk="item"
-                    :key="item.id">
-                </daftar-mk>
-            </ol>
-
-        </div>
-    </div>
-
-    <!-- LATIHAN -->
-    <div class="section">
-        <h2>📋 Tugas Praktikum Mahasiswa</h2>
-
-        <ol>
-            <li>Instal Vue CLI.</li>
-            <li>Buat proyek baru bernama <b>praktikum-vue</b>.</li>
-            <li>Tampilkan nama Anda menggunakan data binding.</li>
-            <li>Buat tombol yang mengubah teks saat diklik.</li>
-            <li>Buat daftar minimal 5 mata kuliah menggunakan v-for.</li>
-            <li>Buat komponen Vue sederhana.</li>
-        </ol>
-
-        <textarea
-            class="form-control"
-            rows="6"
-            placeholder="Tuliskan refleksi atau hasil praktikum Anda di sini..."></textarea>
-    </div>
-
-    <!-- PRETEST -->
-    <div class="section">
-        <h2>✅ Evaluasi Akhir</h2>
-
-        <p>Direktif Vue untuk perulangan adalah:</p>
-
-        <select class="form-select" id="quiz2">
-            <option value="">Pilih Jawaban</option>
-            <option value="v-if">v-if</option>
-            <option value="v-for">v-for</option>
-            <option value="v-model">v-model</option>
-        </select>
-
-        <button class="btn btn-primary mt-3" onclick="cekQuiz2()">
-            Periksa Jawaban
-        </button>
-
-        <div id="hasilQuiz2" class="mt-3"></div>
-    </div>
-
+      </section>
+      
+    </main>
+  </div>
 </div>
 
-https://unpkg.com/vue@3script>
+<!-- ============ FOOTER ============ -->
+<footer class="border-t border-slate-800 py-10 mt-20">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <svg width="24" height="20" viewBox="0 0 261.76 226.69">
+          <path d="M161.096 0L130.879 52.314 100.662 0H0L130.879 226.69 261.76 0z" fill="#42b883"/>
+          <path d="M161.096 0L130.879 52.314 100.662 0H65.439L130.879 113.345 196.318 0z" fill="#35495e"/>
+        </svg>
+        <div class="text-sm">
+          <div class="font-semibold">Praktikum Vue.js — MSIM4401</div>
+          <div class="text-slate-500 text-xs">Berdasarkan Modul 02 Aktivitas 3 · Universitas Terbuka</div>
+        </div>
+      </div>
+      <div class="text-xs text-slate-500">
+        Dibuat untuk tujuan pembelajaran · Vue 3 dari CDN
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle text-emerald-400 text-xl"></i>
+  <div>
+    <div class="font-semibold text-sm" id="toastTitle">Berhasil!</div>
+    <div class="text-xs text-slate-400" id="toastMsg">Topik ditandai selesai</div>
+  </div>
+</div>
 
 <script>
-function cekQuiz1(){
-    let jawaban=document.getElementById("quiz1").value;
-    let hasil=document.getElementById("hasilQuiz1");
-
-    if(jawaban==="A"){
-        hasil.innerHTML="<span class='success'>✅ Benar</span>";
-    }else{
-        hasil.innerHTML="<span class='fail'>❌ Belum tepat. Jawaban yang benar adalah menjalankan aplikasi Vue dalam mode development.</span>";
-    }
-}
-
-function cekQuiz2(){
-    let jawaban=document.getElementById("quiz2").value;
-    let hasil=document.getElementById("hasilQuiz2");
-
-    if(jawaban==="v-for"){
-        hasil.innerHTML="<span class='success'>✅ Benar</span>";
-    }else{
-        hasil.innerHTML="<span class='fail'>❌ Jawaban belum tepat.</span>";
-    }
-}
-</script>
+// ============ KODE CONTOH DEFAULT ============
+const defaultCode = {
+  rendering: `<div id="app">
+  <h2>Halo {{ name }}!</h2>
+  <p>Detik berjalan: <strong style="color:#42b883">{{ counter }}</strong></p>
+  <p style="color:#64748b">{{ pesan }}</p>
+</div>
 
 <script>
-Vue.createApp({
-    data(){
-        return{
-            nama:"Vue",
-            counter:0
-        }
+const { createApp } = Vue;
+
+const App = {
+  data() {
+    return {
+      name: "Vue",
+      counter: 0,
+      pesan: "Rendering deklaratif aktif!"
+    };
+  },
+  mounted() {
+    setInterval(() => {
+      this.counter++;
+    }, 1000);
+  }
+};
+
+createApp(App).mount("#app");
+<\/script>`,
+  
+  interaksi: `<div id="app">
+  <p style="font-size:20px; margin-bottom:16px; font-weight:600;">{{ pesan }}</p>
+  <button v-on:click="reverseStr">Balik String</button>
+  <button v-on:click="resetStr" style="margin-left:8px; background:#64748b;">Reset</button>
+</div>
+
+<script>
+const { createApp } = Vue;
+
+const App = {
+  data() {
+    return {
+      pesan: "Universitas Terbuka"
+    };
+  },
+  methods: {
+    reverseStr() {
+      this.pesan = this.pesan.split('').reverse().join('');
     },
-    mounted(){
-        setInterval(()=>{
-            this.counter++;
-        },1000)
+    resetStr() {
+      this.pesan = "Universitas Terbuka";
     }
-}).mount("#renderApp");
-</script>
+  }
+};
+
+createApp(App).mount("#app");
+<\/script>`,
+  
+  vif: `<div id="app">
+  <p v-if="terlihat" style="font-size:20px; margin-bottom:16px; font-weight:600; color:#42b883;">Universitas Terbuka</p>
+  <p v-else style="font-size:14px; margin-bottom:16px; color:#94a3b8; font-style:italic;">(teks disembunyikan)</p>
+  <button v-on:click="onOff">{{ aksi }}</button>
+</div>
 
 <script>
-Vue.createApp({
-    data(){
-        return{
-            pesan:"Universitas Terbuka"
-        }
-    },
-    methods:{
-        balikPesan(){
-            this.pesan=this.pesan.split('').reverse().join('');
-        }
+const { createApp } = Vue;
+
+const App = {
+  data() {
+    return {
+      terlihat: true,
+      aksi: 'Sembunyikan'
+    };
+  },
+  methods: {
+    onOff() {
+      if (this.aksi === 'Sembunyikan') {
+        this.aksi = 'Tampilkan';
+        this.terlihat = false;
+      } else {
+        this.aksi = 'Sembunyikan';
+        this.terlihat = true;
+      }
     }
-}).mount("#reverseApp");
-</script>
+  }
+};
+
+createApp(App).mount("#app");
+<\/script>`,
+  
+  vfor: `<div id="app">
+  <h2>Universitas Terbuka</h2>
+  <p style="color:#64748b;">Daftar Mata Kuliah:</p>
+  <ol>
+    <li v-for="mk in daftarMK" v-bind:key="mk.text">
+      {{ mk.text }}
+    </li>
+  </ol>
+</div>
 
 <script>
-Vue.createApp({
-    data(){
-        return{
-            terlihat:true
-        }
-    },
-    computed:{
-        tombol(){
-            return this.terlihat ?
-            "Sembunyikan" :
-            "Tampilkan";
-        }
-    },
-    methods:{
-        toggle(){
-            this.terlihat=!this.terlihat;
-        }
-    }
-}).mount("#ifApp");
-</script>
+const { createApp } = Vue;
+
+const App = {
+  data() {
+    return {
+      daftarMK: [
+        { text: 'Algoritma Pemrograman' },
+        { text: 'Pemrograman Perangkat Bergerak' },
+        { text: 'Sistem Terdistribusi' }
+      ]
+    };
+  }
+};
+
+createApp(App).mount("#app");
+<\/script>`,
+  
+  komponen: `<div id="list-mk-app">
+  <h2>Universitas Terbuka</h2>
+  <p style="color:#64748b;">Mata Kuliah Ditawarkan:</p>
+  <ol>
+    <daftar-mk
+      v-for="mkDitawarkan in daftarMK"
+      v-bind:mk="mkDitawarkan"
+      v-bind:key="mkDitawarkan.id">
+    </daftar-mk>
+  </ol>
+</div>
 
 <script>
-Vue.createApp({
-    data(){
-        return{
-            matakuliah:[
-                "Algoritma Pemrograman",
-                "Pemrograman Perangkat Bergerak",
-                "Sistem Terdistribusi"
-            ]
-        }
-    }
-}).mount("#forApp");
-</script>
+const { createApp } = Vue;
 
-<script>
-const app = Vue.createApp({
-    data(){
-        return{
-            mataKuliah:[
-                {id:1,text:"Algoritma Pemrograman"},
-                {id:2,text:"Pemrograman Perangkat Bergerak"},
-                {id:3,text:"Sistem Terdistribusi"}
-            ]
-        }
-    }
+const App = {
+  data() {
+    return {
+      daftarMK: [
+        { id: 0, text: 'Algoritma Pemrograman' },
+        { id: 1, text: 'Pemrograman Perangkat Bergerak' },
+        { id: 2, text: 'Sistem Terdistribusi' }
+      ]
+    };
+  }
+};
+
+const app = Vue.createApp(App);
+
+app.component('daftar-mk', {
+  props: ['mk'],
+  template: '<li>{{ mk.text }}</li>'
 });
 
-app.component('daftar-mk',{
-    props:['mk'],
-    template:'<li>{{ mk.text }}</li>'
-});
+app.mount('#list-mk-app');
+<\/script>`
+};
 
-app.mount('#componentApp');
+// ============ FUNGSI RUN CODE ============
+function buildPreviewDoc(code) {
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://unpkg.com/vue@3"><\/script>
+<style>
+  * { box-sizing: border-box; }
+  body { 
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+    padding: 20px; 
+    background: #f8fafc; 
+    color: #1e293b; 
+    margin: 0; 
+    min-height: 100vh; 
+    line-height: 1.5;
+  }
+  h1, h2, h3 { color: #0f172a; margin: 0 0 8px 0; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  p { margin: 0 0 12px; }
+  button { 
+    background: #42b883; 
+    color: white; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-family: inherit; 
+    font-weight: 600; 
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+  button:hover { background: #35a372; transform: translateY(-1px); }
+  ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 6px 0; padding: 6px 10px; background: white; border-radius: 6px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  strong { color: #42b883; }
+</style>
+</head>
+<body>
+ ${code}
+</body>
+</html>`;
+}
+
+function runCode(key) {
+  const code = document.getElementById('code-' + key).value;
+  const iframe = document.getElementById('preview-' + key);
+  iframe.srcdoc = buildPreviewDoc(code);
+  
+  // Tandai sebagai sudah dijalankan
+  setTimeout(() => {
+    if (!completedSections.has(key)) {
+      markSection(key, true);
+    }
+  }, 500);
+}
+
+function resetEditor(key) {
+  document.getElementById('code-' + key).value = defaultCode[key];
+  runCode(key);
+  showToast('Direset', 'Kode contoh dikembalikan ke asal');
+}
+
+// ============ INIT EDITORS ============
+function initEditors() {
+  Object.keys(defaultCode).forEach(key => {
+    const textarea = document.getElementById('code-' + key);
+    if (textarea) {
+      textarea.value = defaultCode[key];
+      runCode(key);
+    }
+  });
+}
+
+// ============ PROGRESS TRACKING ============
+const completedSections = new Set();
+const totalSections = 8;
+const sectionIds = ['instalasi', 'struktur', 'rendering', 'interaksi', 'vif', 'vfor', 'komponen', 'quiz'];
+
+function markSection(id, silent = false) {
+  completedSections.add(id);
+  
+  // Update nav
+  const navItem = document.querySelector(`[data-section="${id}"]`);
+  if (navItem) navItem.classList.add('completed');
+  
+  updateProgress();
+  
+  if (!silent) {
+    showToast('Topik Selesai', `Bagian "${getSectionTitle(id)}" berhasil diselesaikan`);
+  }
+  
+  // Check if all done
+  if (completedSections.size === totalSections) {
+    setTimeout(() => {
+      launchConfetti();
+      showToast('Praktikum Selesai!', 'Anda telah menyelesaikan semua topik. Luar biasa!');
+    }, 600);
+  }
+}
+
+function getSectionTitle(id) {
+  const titles = {
+    instalasi: 'Instalasi & Konfigurasi',
+    struktur: 'Struktur Proyek',
+    rendering: 'Rendering Deklaratif',
+    interaksi: 'Interaksi Pemakai',
+    vif: 'Kondisional v-if',
+    vfor: 'Perulangan v-for',
+    komponen: 'Komponen Dasar',
+    quiz: 'Tantangan'
+  };
+  return titles[id] || id;
+}
+
+function updateProgress() {
+  const pct = Math.round((completedSections.size / totalSections) * 100);
+  const circle = document.getElementById('progressCircle');
+  const text = document.getElementById('progressText');
+  const circumference = 2 * Math.PI * 17;
+  const offset = circumference - (pct / 100) * circumference;
+  circle.style.strokeDashoffset = offset;
+  text.textContent = pct + '%';
+}
+
+function resetProgress() {
+  completedSections.clear();
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
+  document.querySelectorAll('#quizContainer .quiz-option').forEach(o => {
+    o.classList.remove('correct', 'wrong', 'answered');
+  });
+  quizAnswers = new Array(quizQuestions.length).fill(null);
+  quizCurrentIdx = 0;
+  document.getElementById('quizScore').textContent = '0';
+  document.getElementById('quizResult').classList.add('hidden');
+  renderQuiz();
+  updateProgress();
+  showToast('Progres Direset', 'Semua progres telah dihapus');
+}
+
+// ============ TOAST ============
+function showToast(title, msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+// ============ QUIZ ============
+const quizQuestions = [
+  {
+    q: "Directive Vue apa yang digunakan untuk menangani event klik tombol?",
+    options: [
+      "v-click",
+      "v-on:click",
+      "@event",
+      "onclick"
+    ],
+    correct: 1,
+    explain: "v-on:click adalah directive Vue untuk menangani event klik. Bisa juga disingkat @click."
+  },
+  {
+    q: "Apa fungsi dari {{ }} (kurung kurawal ganda) dalam template Vue?",
+    options: [
+      "Komentar kode",
+      "Deklarasi variabel",
+      "Rendering deklaratif (interpolasi teks)",
+      "Import modul"
+    ],
+    correct: 2,
+    explain: "{{ }} digunakan untuk interpolasi teks — menampilkan nilai data secara reaktif di DOM."
+  },
+  {
+    q: "Directive manakah yang tepat untuk merender elemen secara kondisional (berdasarkan kondisi true/false)?",
+    options: [
+      "v-if",
+      "v-show",
+      "v-cond",
+      "v-display"
+    ],
+    correct: 0,
+    explain: "v-if merender elemen hanya jika kondisi true. Vue juga menyediakan v-else dan v-else-if."
+  },
+  {
+    q: "Pada v-for, atribut apa yang sangat disarankan untuk didefinisikan agar Vue dapat melacak item secara unik?",
+    options: [
+      "v-bind:id",
+      "v-bind:key",
+      "v-bind:index",
+      "v-bind:unique"
+    ],
+    correct: 1,
+    explain: "v-bind:key (atau :key) memberi Vue cara melacak identitas setiap item sehingga rendering daftar lebih efisien dan stabil."
+  },
+  {
+    q: "Method apa yang digunakan untuk mendaftarkan komponen baru secara global di Vue 3?",
+    options: [
+      "Vue.component()",
+      "app.component()",
+      "new Component()",
+      "component.register()"
+    ],
+    correct: 1,
+    explain: "Di Vue 3, setelah createApp(App), kita gunakan app.component('nama', {...}) untuk mendaftarkan komponen global."
+  }
+];
+
+let quizAnswers = new Array(quizQuestions.length).fill(null);
+let quizCurrentIdx = 0;
+
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  const q = quizQuestions[quizCurrentIdx];
+  
+  let html = `<div class="mb-5">
+    <div class="text-xs text-slate-500 mb-2 font-mono">PERTANYAAN ${quizCurrentIdx + 1}</div>
+    <h3 class="font-display font-bold text-lg md:text-xl leading-snug">${q.q}</h3>
+  </div>
+  <div class="space-y-3">`;
+  
+  q.options.forEach((opt, i) => {
+    let cls = '';
+    if (quizAnswers[quizCurrentIdx] !== null) {
+      cls = 'answered';
+      if (i === q.correct) cls += ' correct';
+      else if (i === quizAnswers[quizCurrentIdx]) cls += ' wrong';
+    }
+    const letter = String.fromCharCode(65 + i);
+    html += `<div class="quiz-option ${cls}" onclick="selectAnswer(${i})">
+      <div class="opt-letter">${letter}</div>
+      <div class="text-sm">${opt}</div>
+    </div>`;
+  });
+  
+  html += `</div>`;
+  
+  // Show explanation if answered
+  if (quizAnswers[quizCurrentIdx] !== null) {
+    const isCorrect = quizAnswers[quizCurrentIdx] === q.correct;
+    html += `<div class="mt-4 p-4 rounded-lg ${isCorrect ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-orange-500/10 border border-orange-500/30'}">
+      <div class="flex items-start gap-3">
+        <i class="fas ${isCorrect ? 'fa-check-circle text-emerald-400' : 'fa-circle-info text-orange-400'} text-lg mt-0.5"></i>
+        <div>
+          <div class="font-semibold text-sm mb-1">${isCorrect ? 'Jawaban Benar!' : 'Belum Tepat'}</div>
+          <div class="text-xs text-slate-400">${q.explain}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  
+  container.innerHTML = html;
+  
+  // Update controls
+  document.getElementById('quizCurrent').textContent = quizCurrentIdx + 1;
+  document.getElementById('quizPrev').disabled = quizCurrentIdx === 0;
+  document.getElementById('quizNext').innerHTML = quizCurrentIdx === quizQuestions.length - 1 
+    ? 'Lihat Hasil <i class="fas fa-trophy"></i>'
+    : 'Berikutnya <i class="fas fa-arrow-right"></i>';
+  
+  // Update score
+  const score = quizAnswers.filter((a, i) => a === quizQuestions[i].correct).length;
+  document.getElementById('quizScore').textContent = score;
+}
+
+function selectAnswer(idx) {
+  if (quizAnswers[quizCurrentIdx] !== null) return; // Sudah dijawab
+  quizAnswers[quizCurrentIdx] = idx;
+  renderQuiz();
+  
+  const isCorrect = idx === quizQuestions[quizCurrentIdx].correct;
+  if (isCorrect) {
+    showToast('Jawaban Benar!', 'Pemahaman Anda tepat untuk topik ini');
+  }
+  
+  // Check quiz completion
+  if (quizAnswers.every(a => a !== null)) {
+    const score = quizAnswers.filter((a, i) => a === quizQuestions[i].correct).length;
+    setTimeout(() => {
+      showQuizResult(score);
+    }, 800);
+  }
+}
+
+function nextQuestion() {
+  if (quizCurrentIdx < quizQuestions.length - 1) {
+    quizCurrentIdx++;
+    renderQuiz();
+  } else {
+    // Show final result
+    const score = quizAnswers.filter((a, i) => a === quizQuestions[i].correct).length;
+    showQuizResult(score);
+  }
+}
+
+function prevQuestion() {
+  if (quizCurrentIdx > 0) {
+    quizCurrentIdx--;
+    renderQuiz();
+  }
+}
+
+function showQuizResult(score) {
+  const result = document.getElementById('quizResult');
+  document.getElementById('finalScore').textContent = score + '/5';
+  
+  let msg;
+  if (score === 5) msg = 'Sempurna! Anda menguasai dasar Vue.js dengan sangat baik.';
+  else if (score >= 3) msg = 'Bagus! Pemahaman dasar Anda sudah cukup. Tetap berlatih!';
+  else msg = 'Tetap semangat! Coba pelajari kembali bagian yang belum tepat.';
+  
+  document.getElementById('resultMessage').textContent = msg;
+  result.classList.remove('hidden');
+  result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  
+  markSection('quiz', true);
+  
+  if (score === 5) {
+    launchConfetti();
+  }
+}
+
+function resetQuiz() {
+  quizAnswers = new Array(quizQuestions.length).fill(null);
+  quizCurrentIdx = 0;
+  document.getElementById('quizResult').classList.add('hidden');
+  document.getElementById('quizScore').textContent = '0';
+  renderQuiz();
+  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============ CONFETTI ============
+function launchConfetti() {
+  const colors = ['#42b883', '#fb923c', '#10b981', '#fbbf24', '#f87171', '#5cd6a4'];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = '-20px';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      c.style.transform = `rotate(${Math.random() * 360}deg)`;
+      document.body.appendChild(c);
+      
+      const duration = 2500 + Math.random() * 1500;
+      const xMove = (Math.random() - 0.5) * 300;
+      
+      c.animate([
+        { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+        { transform: `translate(${xMove}px, 100vh) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+      ], {
+        duration: duration,
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+      });
+      
+      setTimeout(() => c.remove(), duration);
+    }, i * 25);
+  }
+}
+
+// ============ PARTICLES (HERO) ============
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 2 + Math.random() * 4;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.background = Math.random() > 0.5 ? '#42b883' : '#5cd6a4';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = Math.random() * 10 + 's';
+    p.style.opacity = (0.2 + Math.random() * 0.4).toString();
+    container.appendChild(p);
+  }
+}
+
+// ============ LIVE COUNTER (HERO TYPING) ============
+let heroCounter = 0;
+function startHeroCounter() {
+  setInterval(() => {
+    heroCounter++;
+    const el = document.getElementById('liveCounter');
+    if (el) el.textContent = heroCounter;
+  }, 1000);
+}
+
+// ============ SCROLL SPY (ACTIVE NAV) ============
+function setupScrollSpy() {
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(n => {
+          n.classList.toggle('active', n.dataset.section === id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  
+  sections.forEach(s => observer.observe(s));
+}
+
+// ============ REVEAL ON SCROLL ============
+function setupReveal() {
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  reveals.forEach(r => observer.observe(r));
+}
+
+// ============ KEY: tab support in textarea ============
+function setupTabSupport() {
+  document.querySelectorAll('.code-editor').forEach(textarea => {
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        textarea.value = textarea.value.substring(0, start) + '  ' + textarea.value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + 2;
+      }
+    });
+  });
+}
+
+// ============ INIT ============
+window.addEventListener('DOMContentLoaded', () => {
+  createParticles();
+  startHeroCounter();
+  setupScrollSpy();
+  setupReveal();
+  initEditors();
+  renderQuiz();
+  setupTabSupport();
+  updateProgress();
+});
 </script>
 
 </body>
