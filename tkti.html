@@ -130,6 +130,11 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
+  .result-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
   .result-item { padding: 4px 0; }
   .result-item-label {
     color: var(--muted);
@@ -140,6 +145,24 @@
     margin-bottom: 6px;
   }
   .result-item-value { font-size: 17px; font-weight: 500; }
+  .result-item-value.muted { color: var(--muted); font-weight: 400; }
+  .section-label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin: 18px 0 12px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .section-label-bobot {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+  }
   .not-found {
     background: var(--danger-light);
     color: var(--danger);
@@ -170,7 +193,8 @@
   }
   @media (max-width: 480px) {
     .search-form { flex-direction: column; }
-    .result-grid { grid-template-columns: 1fr; gap: 12px; }
+    .result-grid,
+    .result-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .header h1 { font-size: 22px; }
     .result-header { flex-direction: column; align-items: stretch; }
     .grade-badge { align-self: flex-start; }
@@ -196,17 +220,17 @@
         />
         <button type="submit" id="search-btn" disabled>Memuat...</button>
       </form>
-      <p class="hint">Tekan Enter atau klik Cari..</p>
+      <p class="hint">Tekan Enter atau klik Cari</p>
     </div>
 
     <div class="status" id="status">
-      <span class="loading-spinner"></span>Memuat data .....
+      <span class="loading-spinner"></span>Memuat data...
     </div>
 
     <div class="result" id="result"></div>
 
     <footer class="footer">
-      Nilai Tata Kelola Teknologi Informasi - D - 2026
+      Nilai Mata Kuliah TKTI -D - 2026
     </footer>
   </div>
 
@@ -251,6 +275,18 @@
           // col[3]=Akt Partisipatif, col[4]=Hasil Proyek, col[5]=Tugas,
           // col[6]=Quiz, col[7]=UTS, col[8]=UAS,
           // col[9]=Nilai Angka, col[10]=Nilai Huruf, col[11]=Kehadiran
+          // Bobot: Tugas 10%, Quiz 30%, UTS 30%, UAS 30%
+          function getCell(c, idx) {
+            const raw = c[idx] && (c[idx].f != null ? c[idx].f : c[idx].v);
+            if (raw == null) return '';
+            const s = String(raw).trim();
+            return s;
+          }
+          function numOrDash(val) {
+            if (!val) return '';
+            const n = Number(val);
+            return isNaN(n) ? val : String(n);
+          }
           for (const row of rows) {
             const c = row.c || [];
             const nimRaw = c[1] && c[1].v;
@@ -259,25 +295,22 @@
             // NIM valid = 12 digit angka (filter baris header/info)
             if (!/^\d{12}$/.test(nimStr)) continue;
 
-            const angkaRaw = c[9] && c[9].v;
-            let nilaiAngka = '-';
-            if (angkaRaw != null) {
-              const n = Number(angkaRaw);
-              nilaiAngka = isNaN(n) ? String(angkaRaw) : String(n);
-            }
-
-            const kehadiranRaw = c[11] && (c[11].f || c[11].v);
-            const kehadiran = kehadiranRaw != null ? String(kehadiranRaw).trim() : '-';
-
-            const nilaiHurufRaw = c[10] && (c[10].f || c[10].v);
-            const nilaiHuruf = nilaiHurufRaw != null ? String(nilaiHurufRaw).trim() : '-';
-
-            const namaRaw = c[2] && (c[2].f || c[2].v);
-            const nama = namaRaw != null ? String(namaRaw).trim() : '-';
+            const nama = getCell(c, 2) || '-';
+            const tugas = numOrDash(getCell(c, 5));
+            const quiz = numOrDash(getCell(c, 6));
+            const uts = numOrDash(getCell(c, 7));
+            const uas = numOrDash(getCell(c, 8));
+            const nilaiAngka = numOrDash(getCell(c, 9)) || '-';
+            const nilaiHuruf = getCell(c, 10) || '-';
+            const kehadiran = getCell(c, 11) || '-';
 
             students.push({
               nim: nimStr,
               nama: nama,
+              tugas: tugas,
+              quiz: quiz,
+              uts: uts,
+              uas: uas,
               nilaiAngka: nilaiAngka,
               nilaiHuruf: nilaiHuruf,
               kehadiran: kehadiran,
@@ -327,6 +360,7 @@
             </div>
           `;
         } else {
+          function valOrDash(v) { return v ? `<span>${escapeHtml(v)}</span>` : '<span class="result-item-value muted">tidak ada</span>'; }
           resultEl.innerHTML = `
             <div class="result-card">
               <div class="result-header">
@@ -336,6 +370,28 @@
                 </div>
                 <div class="grade-badge">${escapeHtml(found.nilaiHuruf)}</div>
               </div>
+
+              <div class="section-label">Komponen Nilai <span class="section-label-bobot">(bobot)</span></div>
+              <div class="result-grid-4">
+                <div class="result-item">
+                  <div class="result-item-label">Tugas <span class="section-label-bobot">10%</span></div>
+                  <div class="result-item-value">${valOrDash(found.tugas)}</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">Quiz <span class="section-label-bobot">30%</span></div>
+                  <div class="result-item-value">${valOrDash(found.quiz)}</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">UTS <span class="section-label-bobot">30%</span></div>
+                  <div class="result-item-value">${valOrDash(found.uts)}</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">UAS <span class="section-label-bobot">30%</span></div>
+                  <div class="result-item-value">${valOrDash(found.uas)}</div>
+                </div>
+              </div>
+
+              <div class="section-label">Nilai Akhir</div>
               <div class="result-grid">
                 <div class="result-item">
                   <div class="result-item-label">Nilai Angka</div>
@@ -367,3 +423,4 @@
   </script>
 </body>
 </html>
+
