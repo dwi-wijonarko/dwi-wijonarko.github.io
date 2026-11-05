@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cari Nilai Mahasiswa by NIM</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --border: #e5e7eb;
+    --danger: #ef4444;
+    --danger-light: #fef2f2;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 28px; }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .header p { color: var(--muted); font-size: 14px; }
+  .search-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .search-form { display: flex; gap: 10px; }
+  .search-form input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    color: var(--text);
+  }
+  .search-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+  .search-form button {
+    padding: 14px 24px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .search-form button:hover:not(:disabled) { background: #1d4ed8; }
+  .search-form button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
+  .status {
+    text-align: center;
+    padding: 14px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .status.error { color: var(--danger); }
+  .result { display: none; }
+  .result.show { display: block; }
+  .result-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .result-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .result-nim {
+    color: var(--muted);
+    font-size: 14px;
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    letter-spacing: 0.02em;
+  }
+  .grade-badge {
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    min-width: 64px;
+    text-align: center;
+  }
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .result-item { padding: 4px 0; }
+  .result-item-label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .result-item-value { font-size: 17px; font-weight: 500; }
+  .not-found {
+    background: var(--danger-light);
+    color: var(--danger);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #fee2e2;
+  }
+  .not-found-title { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
+  .not-found-desc { font-size: 13px; color: #991b1b; }
+  .loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 32px;
+  }
+  @media (max-width: 480px) {
+    .search-form { flex-direction: column; }
+    .result-grid { grid-template-columns: 1fr; gap: 12px; }
+    .header h1 { font-size: 22px; }
+    .result-header { flex-direction: column; align-items: stretch; }
+    .grade-badge { align-self: flex-start; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Cari Nilai Mahasiswa</h1>
+      <p>Masukkan NIM untuk melihat data nilai akhir</p>
+    </header>
+
+    <div class="search-card">
+      <form class="search-form" id="search-form">
+        <input
+          type="text"
+          id="nim-input"
+          placeholder="Contoh: 252410102001"
+          inputmode="numeric"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="submit" id="search-btn" disabled>Memuat...</button>
+      </form>
+      <p class="hint">Tekan Enter atau klik Cari..</p>
+    </div>
+
+    <div class="status" id="status">
+      <span class="loading-spinner"></span>Memuat data .....
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <footer class="footer">
+      Nilai Tata Kelola Teknologi Informasi - D - 2026
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      // ============================================================
+      // KONFIGURASI
+      // Ganti SHEET_ID bila Anda pakai sheet lain (lihat di URL sheet)
+      // ============================================================
+      const SHEET_ID = '1dPcu1Lpqv4txOsK5V8JWkgLnqt8_r9AN';
+      const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+      let students = [];
+      let loaded = false;
+
+      const statusEl = document.getElementById('status');
+      const resultEl = document.getElementById('result');
+      const form = document.getElementById('search-form');
+      const input = document.getElementById('nim-input');
+      const btn = document.getElementById('search-btn');
+
+      // ============================================================
+      // AMBIL DATA DARI GOOGLE SHEET (gviz API, return JSON)
+      // ============================================================
+      async function loadSheet() {
+        try {
+          const res = await fetch(GVIZ_URL, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const text = await res.text();
+
+          // gviz membungkus JSON dengan: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+          const jsonStart = text.indexOf('{');
+          const jsonEnd = text.lastIndexOf('}');
+          if (jsonStart === -1 || jsonEnd === -1) {
+            throw new Error('Format respons tidak dikenali');
+          }
+          const data = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+          const rows = (data.table && data.table.rows) || [];
+
+          // Mapping kolom (berdasarkan struktur sheet):
+          // col[0]=No, col[1]=NIM, col[2]=Nama,
+          // col[3]=Akt Partisipatif, col[4]=Hasil Proyek, col[5]=Tugas,
+          // col[6]=Quiz, col[7]=UTS, col[8]=UAS,
+          // col[9]=Nilai Angka, col[10]=Nilai Huruf, col[11]=Kehadiran
+          for (const row of rows) {
+            const c = row.c || [];
+            const nimRaw = c[1] && c[1].v;
+            if (nimRaw == null) continue;
+            const nimStr = String(nimRaw).trim();
+            // NIM valid = 12 digit angka (filter baris header/info)
+            if (!/^\d{12}$/.test(nimStr)) continue;
+
+            const angkaRaw = c[9] && c[9].v;
+            let nilaiAngka = '-';
+            if (angkaRaw != null) {
+              const n = Number(angkaRaw);
+              nilaiAngka = isNaN(n) ? String(angkaRaw) : String(n);
+            }
+
+            const kehadiranRaw = c[11] && (c[11].f || c[11].v);
+            const kehadiran = kehadiranRaw != null ? String(kehadiranRaw).trim() : '-';
+
+            const nilaiHurufRaw = c[10] && (c[10].f || c[10].v);
+            const nilaiHuruf = nilaiHurufRaw != null ? String(nilaiHurufRaw).trim() : '-';
+
+            const namaRaw = c[2] && (c[2].f || c[2].v);
+            const nama = namaRaw != null ? String(namaRaw).trim() : '-';
+
+            students.push({
+              nim: nimStr,
+              nama: nama,
+              nilaiAngka: nilaiAngka,
+              nilaiHuruf: nilaiHuruf,
+              kehadiran: kehadiran,
+            });
+          }
+
+          if (students.length === 0) {
+            throw new Error('Tidak ada baris mahasiswa yang valid terbaca.');
+          }
+
+          loaded = true;
+          statusEl.style.display = 'none';
+          btn.disabled = false;
+          btn.textContent = 'Cari';
+          input.focus();
+        } catch (err) {
+          statusEl.classList.add('error');
+          statusEl.innerHTML = `Gagal memuat data: ${escapeHtml(err.message)}.<br/>Coba refresh halaman, atau pastikan koneksi internet aktif.`;
+        }
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, ch => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[ch]));
+      }
+
+      // ============================================================
+      // CARI NIM
+      // ============================================================
+      function search(nim) {
+        const clean = nim.trim();
+        resultEl.classList.remove('show');
+
+        if (!clean) {
+          resultEl.innerHTML = '';
+          return;
+        }
+
+        const found = students.find(s => s.nim === clean);
+
+        if (!found) {
+          resultEl.innerHTML = `
+            <div class="not-found">
+              <div class="not-found-title">NIM ${escapeHtml(clean)} tidak ditemukan</div>
+              <div class="not-found-desc">Periksa kembali NIM yang Anda masukkan, atau hubungi dosen pengampu.</div>
+            </div>
+          `;
+        } else {
+          resultEl.innerHTML = `
+            <div class="result-card">
+              <div class="result-header">
+                <div>
+                  <div class="result-name">${escapeHtml(found.nama)}</div>
+                  <div class="result-nim">NIM: ${escapeHtml(found.nim)}</div>
+                </div>
+                <div class="grade-badge">${escapeHtml(found.nilaiHuruf)}</div>
+              </div>
+              <div class="result-grid">
+                <div class="result-item">
+                  <div class="result-item-label">Nilai Angka</div>
+                  <div class="result-item-value">${escapeHtml(found.nilaiAngka)}</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">Nilai Huruf</div>
+                  <div class="result-item-value">${escapeHtml(found.nilaiHuruf)}</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">Kehadiran</div>
+                  <div class="result-item-value">${escapeHtml(found.kehadiran)}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        resultEl.classList.add('show');
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!loaded) return;
+        search(input.value);
+      });
+
+      loadSheet();
+    })();
+  </script>
+</body>
+</html>
